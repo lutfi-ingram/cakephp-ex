@@ -11,7 +11,7 @@
                 </p>
 
 <ol>
-  <li>From the Web Console homepage, navigate to your project</li>
+  <li>From the Web Console homepage, navigate to your projectsssss</li>
   <li>Click on Browse &gt; Builds</li>
   <li>Click the link with your BuildConfig name</li>
   <li>Click the Configuration tab</li>
