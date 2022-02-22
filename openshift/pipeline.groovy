@@ -17,7 +17,7 @@ pipeline {
         stage('Create App') {
             steps {
                 script {
-                    openshift.withCluster( 'devocpcluster' ) {
+                    openshift.withCluster( "${params.CLUSTER_NAME}" ) {
                         try {
                             def created = openshift.newApp( 'openshift/templates/cakephp-mysql.json' )
                         } catch (Exception ex) {
@@ -30,7 +30,7 @@ pipeline {
         stage('Build') {
             steps {
                 script {
-                    openshift.withCluster( 'devocpcluster' ) {
+                    openshift.withCluster( "${params.CLUSTER_NAME}" ) {
                         def bc = openshift.selector( "bc/${params.BC_NAME}" )
                         def result = bc.startBuild('--follow=true')
                         timeout(10) {
@@ -43,7 +43,7 @@ pipeline {
         stage('Rollout') {
             steps {
                 script {
-                    openshift.withCluster( 'devocpcluster' ) {
+                    openshift.withCluster( "${params.CLUSTER_NAME}" ) {
                         def dc = openshift.selector( "dc/${params.APPLICATION}" )
                         try {
                             def rollout = dc.rollout()
