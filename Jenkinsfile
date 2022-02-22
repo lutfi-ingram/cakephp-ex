@@ -19,7 +19,7 @@ pipeline {
                 script {
                     openshift.withCluster( "${params.CLUSTER_NAME}" ) {
                         try {
-                            def created = openshift.newApp( '/openshift/templates/cakephp-mysql.json' )
+                            def created = openshift.newApp( 'https://raw.githubusercontent.com/lutfi-ingram/cakephp-ex/master/openshift/templates/cakephp-mysql.json' )
                         } catch (Exception ex) {
                             println(ex.getMessage())
                         }
