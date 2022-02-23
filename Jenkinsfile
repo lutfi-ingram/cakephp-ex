@@ -17,9 +17,9 @@ pipeline {
         stage('Create App') {
             steps {
                 script {
-                    openshift.withCluster( "${params.CLUSTER_NAME}" ) {
+                    openshift.withCluster() {
                         try {
-                            def created = openshift.newApp( 'https://raw.githubusercontent.com/lutfi-ingram/cakephp-ex/master/openshift/templates/cakephp-mysql.json' )
+                            def created = openshift.newApp( 'templates.json' )
                         } catch (Exception ex) {
                             println(ex.getMessage())
                         }
@@ -30,9 +30,9 @@ pipeline {
         stage('Build') {
             steps {
                 script {
-                    openshift.withCluster( "${params.CLUSTER_NAME}" ) {
+                    openshift.withCluster() {
                         def bc = openshift.selector( "bc/${params.BC_NAME}" )
-                        def result = bc.startBuild('--follow=true')
+                        def result = bc.startBuild()
                         timeout(10) {
                             result.logs('-f')
                         }
@@ -43,7 +43,7 @@ pipeline {
         stage('Rollout') {
             steps {
                 script {
-                    openshift.withCluster( "${params.CLUSTER_NAME}" ) {
+                    openshift.withCluster() {
                         def dc = openshift.selector( "dc/${params.APPLICATION}" )
                         try {
                             def rollout = dc.rollout()
