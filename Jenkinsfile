@@ -3,13 +3,15 @@ pipeline {
     triggers {
         pollSCM '*/1 * * * *'
     }
-
+    // environment {
+    //     APPEXIST = 'no'
+    // }
     stages {
         stage('Checkout') {
             steps {
-                checkout scm: [ 
+                checkout scm: [
                     $class: 'GitSCM',
-                    userRemoteConfigs: [[url: 'https://github.com/lutfi-ingram/cakephp-ex.git']],
+                    userRemoteConfigs: [[url: "${params.REPOSITORY_URL}"]],
                     branches: [[name: 'refs/heads/master']]
                 ], poll: true
             }
@@ -19,9 +21,11 @@ pipeline {
                 script {
                     openshift.withCluster() {
                         try {
-                            def created = openshift.newApp( 'templates.json' )
+                            openshift.newApp( 'openshift/template.json', "-p", "NAME=${params.APPLICATION}","-p","SOURCE_REPOSITORY_URL=${params.REPOSITORY_URL}"  )
+                            sh 'echo no > variable2022_0001.txt'
                         } catch (Exception ex) {
                             println(ex.getMessage())
+                            sh 'echo yes > variable2022_0001.txt'
                         }
                     }
                 }
@@ -31,10 +35,14 @@ pipeline {
             steps {
                 script {
                     openshift.withCluster() {
-                        def bc = openshift.selector( "bc/${params.BC_NAME}" )
-                        def result = bc.startBuild()
-                        timeout(10) {
-                            result.logs('-f')
+                        def APPEXIST = readFile('variable2022_0001.txt').trim()
+                        println(APPEXIST)
+                        if (APPEXIST == 'yes'){
+                            def bc = openshift.selector( "bc/${params.APPLICATION}" )
+                            def result = bc.startBuild()
+                            timeout(10) {
+                                result.logs('-f')
+                            }
                         }
                     }
                 }
@@ -43,14 +51,16 @@ pipeline {
         stage('Rollout') {
             steps {
                 script {
-                    openshift.withCluster() {
-                        def dc = openshift.selector( "dc/${params.APPLICATION}" )
-                        try {
-                            def rollout = dc.rollout()
-                            def resultRollout = rollout.latest()
-                            resultRollout.logs('-f')
-                    } catch (Exception ex) {
-                            println(ex.getMessage())
+                    def APPEXIST = readFile('variable2022_0001.txt').trim()
+                    if (APPEXIST == 'yes'){
+                        openshift.withCluster() {
+                            def dc = openshift.selector( "dc/${params.APPLICATION}" )
+                            try {
+                                def rollout = dc.rollout()
+                                rollout.latest()
+                            } catch (Exception ex) {
+                                println(ex.getMessage())
+                            }
                         }
                     }
                 }
