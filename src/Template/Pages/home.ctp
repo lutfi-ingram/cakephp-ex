@@ -1,7 +1,7 @@
         <div class="row">
           <section class='col-xs-12 col-sm-6 col-md-6'>
             <section>
-              <h1 style="color:#ff0044">Hello I modified this line 006</h1>
+              <h1 style="color:#ff0044">Hello I modified this line 007</h1>
                 <p>For instructions on how to use this application with OpenShift, start by reading the <a href="http://docs.okd.io/latest/dev_guide/templates.html#using-the-quickstart-templates">Developer Guide</a>.</p>
 
               <h2>Deploying code changes</h2>
